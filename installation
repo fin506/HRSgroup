@@ -1,1 +1,15 @@
-script.Parent.Text = "HRSgroup" .. game.PlaceVersion
+print("HRSgroup This game has got HRSgroup products installed!")
+local BannedPlayers = {
+    ["PlayerToBan1"] = true, 
+    ["PlayerToBan2"] = true
+}
+
+-- Service to manage players
+local Players = game:GetService("Players")
+
+
+Players.PlayerAdded:Connect(function(player)
+    if BannedPlayers[player.Name] then
+        player:Kick("HRSgroup User banned from all games using HRSgroup systems.")
+    end
+end)
