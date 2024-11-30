@@ -1,1 +1,1 @@
-
+script.Parent.Text = "HRSgroup" .. game.PlaceVersion
