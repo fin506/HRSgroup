@@ -1,0 +1,44 @@
+function teamFromColor(color) 
+for _,t in pairs(game:GetService("Teams"):GetChildren()) do 
+if t.TeamColor==color then return t end 
+end 
+return nil 
+end 
+
+function onSpawned(plr) 
+local tools = teamFromColor(plr.TeamColor):GetChildren() 
+for _,c in pairs(tools) do 
+c:Clone().Parent = plr.Backpack 
+end 
+end 
+
+function onChanged(prop,plr) 
+if prop=="Character" then 
+onSpawned(plr) 
+end 
+end 
+
+function onAdded(plr) 
+plr.Changed:connect(function(prop) 
+onChanged(prop,plr) 
+end) 
+end 
+
+game.Players.PlayerAdded:connect(onAdded)
+
+game.Players.PlayerAdded:Connect(function(newPlayer)
+	local rank = newPlayer:GetRankInGroup(17277904) -- Put groupid here
+	local teamName = ""
+	if rank >= 254 then
+		teamName = "Senior Leadership team" -- Change owner to team name
+	elseif rank >= 3 then -- Change 254 to your rank number
+		teamName = "Year 11" -- Change admin to team name
+	elseif rank >= 2 then -- Change 0 to your rank number
+		teamName = "Year 10" -- Change member to team name
+	elseif rank >= 1 then -- Change 0 to your rank number
+		teamName = "Year 10" -- Change member to team name
+	elseif rank >= 4 then -- Change 0 to your rank number
+		teamName = "Staff" -- Change member to team name
+	end
+	newPlayer.TeamColor = game.Teams[teamName].TeamColor
+end)
