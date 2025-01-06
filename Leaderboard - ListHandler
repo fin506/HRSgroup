@@ -1,4 +1,48 @@
-game.StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, false)
+-- Whitelist System for Roblox Scripts
+
+-- GAME WHITELIST: List of GameIds allowed to run this script
+local authorizedGames = {14614012690} -- Replace with your GameId(s)
+
+-- PLAYER WHITELIST: List of UserIds allowed to use this script
+local authorizedUsers = {12345678, 87654321} -- Replace with your UserId(s)
+
+-- Enable server verification (optional, requires an external server)
+local useServerValidation = false
+local serverValidationUrl = "https://your-auth-server.com/validate" -- Replace with your server URL
+
+-- Services
+local httpService = game:GetService("HttpService")
+
+-- Functions
+local function isGameAuthorized()
+    return table.find(authorizedGames, game.GameId) ~= nil
+end
+
+local function isPlayerAuthorized(player)
+    return table.find(authorizedUsers, player.UserId) ~= nil
+end
+
+local function validateWithServer(player)
+    if not useServerValidation then return true end
+    local success, response = pcall(function()
+        return httpService:GetAsync(serverValidationUrl .. "?gameId=" .. game.GameId .. "&userId=" .. player.UserId)
+    end)
+    return success and response == "Authorized"
+end
+
+-- Main Logic
+if not isGameAuthorized() then
+    error("This game is not authorized to run this script!")
+end
+
+game.Players.PlayerAdded:Connect(function(player)
+    if not isPlayerAuthorized(player) or not validateWithServer(player) then
+        player:Kick("You are not authorized to use this script!")
+    end
+end)
+
+
+Game.StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, false)
 local template = script:WaitForChild("PlayerFrame")
 local scroller = script.Parent:WaitForChild("PlayerScroller")
 local uis = game:GetService("UserInputService")
