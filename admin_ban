@@ -1,0 +1,60 @@
+local ServerScriptService = game:GetService("ServerScriptService")
+
+local banScriptSource = [[
+local Players = game:GetService("Players")
+local Settings = require(script.Parent.Configuration.Settings)
+
+-- Ban command function
+local function banPlayer(admin, targetName)
+	if not Settings.IsAdmin(admin) then
+		warn(admin.Name .. " tried to use ban without permission.")
+		return
+	end
+
+	local target = Players:FindFirstChild(targetName)
+	if not target then
+		warn("Player not found: " .. targetName)
+		return
+	end
+
+	Settings.BanPlayer(target.UserId)
+	target:Kick("HRSgroup || A server admin has banned you from their game, if you belive this is an error, please make an attempt to contact a member of moderation or alternitivly, HRSgroup.")
+	print(target.Name .. " has been banned by " .. admin.Name)
+end
+
+-- Command handler
+local function handleCommand(player, message)
+	if not Settings.IsAdmin(player) then return end
+	if not message:match("^=") then return end
+
+	local args = message:lower():split(" ")
+	local command = args[1]:sub(2) -- Remove the "=" prefix
+
+	if Settings.Commands[command] then
+		if command == "ban" and args[2] then
+			banPlayer(player, args[2])
+		end
+		-- Add more commands here using elseif
+	end
+end
+
+-- Listen to player chats
+Players.PlayerAdded:Connect(function(player)
+	-- Check if banned
+	if Settings.IsBanned(player.UserId) then
+		player:Kick("HRSgroup || A server admin has banned you from their game, if you belive this is an error, please make an attempt to contact a member of moderation or alternitivly, HRSgroup.")
+		return
+	end
+
+	player.Chatted:Connect(function(message)
+		handleCommand(player, message)
+	end)
+end)
+]]
+
+local newScript = Instance.new("Script")
+newScript.Name = "BanCommandHandler"
+newScript.Source = banScriptSource
+newScript.Parent = ServerScriptService
+
+print("Ban command script spawned successfully! ")
